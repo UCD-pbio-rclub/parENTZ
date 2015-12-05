@@ -1,2 +1,4 @@
 # Analyze parental data
-# more to come
+[parENTZ just don't understand](https://www.youtube.com/watch?v=jW3PFC86UN)
+
+
