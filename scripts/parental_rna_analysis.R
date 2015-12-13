@@ -112,10 +112,70 @@ system.time(GC_voom <- voom(GC_DE, full_model, plot = TRUE))
 system.time(GC_fit_full <-lmFit(GC_voom, full_model))
 GC_fit_full <- eBayes(GC_fit_full)
 toptable(GC_fit_full)
-?decideTests
+str(GC_fit_full)
+head(GC_fit_full$coef)
+?topTable
+topTable(GC_fit_full, coef="GC_genoIMB211", n = 2000)
 
-GC_result <- decideTests(GC_fit_full, method = "global")
+GC_fit_full <- treat(GC_fit_full, lfc = 2)
+topTreat(GC_fit_full, coef="GC_genoIMB211", n = 20)
+topTreat(GC_fit_full, coef="GC_genoIMB211:GC_trtSUN", n = 20)
+head(coef(GC_fit_full))
+
+
+?decideTests
+GC_result <- decideTests(GC_fit_full)
 GC_result
 summary(GC_result)
 ?genas
 ?vooma
+
+topTable(GC_fit_full, coef="GC_genoIMB211:GC_trtSHADE")
+
+designlist <- list(
+  geno <- model.matrix(~GC_geno),
+  trt <- model.matrix(~GC_trt),
+  tissue <- model.matrix(~GC_tissue), 
+  g_trt <- model.matrix(~GC_geno*GC_trt),
+  tis_geno <- model.matrix(~GC_geno*GC_tissue),
+  trt_tis <- model.matrix(~GC_trt*GC_tissue)
+  # full <- model.matrix(~GC_geno*GC_trt*GC_trt)
+)
+
+designlist
+?selectModel
+out <- selectModel(GC_voom,designlist, criterion="bic")
+
+table(out$pref)
+str(out)
+
+modelout <- out$pref
+head(modelout)
+
+# genotype only model
+geno <- model.matrix(~GC_geno)
+GC_DE <- calcNormFactors(GC_DE)
+system.time(GC_geno_voom <- voom(GC_DE, geno, plot = TRUE))
+system.time(GC_geno_fit <-lmFit(GC_geno_voom, geno))
+GC_geno_fit <- eBayes(GC_geno_fit)
+topTable(GC_geno_fit)
+
+# treatment only model
+trt <- model.matrix(~GC_trt)
+system.time(GC_trt_voom <- voom(GC_DE, trt, plot = TRUE))
+system.time(GC_trt_fit <-lmFit(GC_trt_voom, trt))
+GC_trt_fit <- eBayes(GC_trt_fit)
+?topTable
+topTable(GC_trt_fit, number = 500)
+
+
+# treatment only model
+trt <- model.matrix(~GC_trt)
+system.time(GC_trt_voom <- voom(GC_DE, trt, plot = TRUE))
+system.time(GC_trt_fit <-lmFit(GC_trt_voom, trt))
+GC_trt_fit <- eBayes(GC_trt_fit)
+?topTable
+topTable(GC_trt_fit, number = 500)
+
+
+
