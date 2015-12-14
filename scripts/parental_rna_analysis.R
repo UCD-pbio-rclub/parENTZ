@@ -2,8 +2,13 @@
 # Cody Markelz
 # markelz@gmail.com
 # B rapa parental RNA-seq
-# Modified December 12, 2015
+# Modified December 14, 2015
 ###########
+# TODO:
+# subset genotype to look at shade
+# remove bad libs across all three datasets
+# 
+
 # load libs
 library(edgeR)
 library(limma)
@@ -28,10 +33,15 @@ tail(GC_counts)
 GC_counts <- GC_counts[-1,]
 head(GC_counts)[,1:10]
 
+# remove bad GC libs here
 
 ##########
 # greenhouse and field data import and clean up
 ##########
+
+# make sure to remove bad leaf libs
+# seperate field and GH data
+
 GH_counts <- read.delim("GH_merged_v1.5_mapping.tsv", row.names = NULL)
 head(GH_counts)
 rownames(GH_counts) <- GH_counts$gene
@@ -115,7 +125,7 @@ toptable(GC_fit_full)
 str(GC_fit_full)
 head(GC_fit_full$coef)
 ?topTable
-topTable(GC_fit_full, coef="GC_genoIMB211", n = 2000)
+topTable(GC_fit_full, coef="GC_genoIMB211", n = 200)
 
 GC_fit_full <- treat(GC_fit_full, lfc = 2)
 topTreat(GC_fit_full, coef="GC_genoIMB211", n = 20)
@@ -144,38 +154,53 @@ designlist <- list(
 
 designlist
 ?selectModel
+# take a look at model selection
 out <- selectModel(GC_voom,designlist, criterion="bic")
 
 table(out$pref)
+head(out$pref)
 str(out)
 
-modelout <- out$pref
+# tissue driving most of the response
+modelout <- as.data.frame(out$pref)
 head(modelout)
 
 # genotype only model
 geno <- model.matrix(~GC_geno)
 GC_DE <- calcNormFactors(GC_DE)
 system.time(GC_geno_voom <- voom(GC_DE, geno, plot = TRUE))
-system.time(GC_geno_fit <-lmFit(GC_geno_voom, geno))
+system.time(GC_geno_fit <- lmFit(GC_geno_voom, geno))
 GC_geno_fit <- eBayes(GC_geno_fit)
-topTable(GC_geno_fit)
+topTable(GC_geno_fit, number = 50)
+# output gene lists
 
 # treatment only model
+# basically nothing. All variance is in tissue type.
 trt <- model.matrix(~GC_trt)
 system.time(GC_trt_voom <- voom(GC_DE, trt, plot = TRUE))
-system.time(GC_trt_fit <-lmFit(GC_trt_voom, trt))
+system.time(GC_trt_fit <- lmFit(GC_trt_voom, trt))
 GC_trt_fit <- eBayes(GC_trt_fit)
 ?topTable
-topTable(GC_trt_fit, number = 500)
+topTable(GC_trt_fit, number = 50)
+# output gene lists
 
-
-# treatment only model
-trt <- model.matrix(~GC_trt)
-system.time(GC_trt_voom <- voom(GC_DE, trt, plot = TRUE))
-system.time(GC_trt_fit <-lmFit(GC_trt_voom, trt))
-GC_trt_fit <- eBayes(GC_trt_fit)
+# tissue only model
+tissue <- model.matrix(~GC_tissue)
+system.time(GC_tissue_voom <- voom(GC_DE, tissue, plot = TRUE))
+system.time(GC_tissue_fit <- lmFit(GC_tissue_voom, tissue))
+GC_tissue_fit <- eBayes(GC_tissue_fit)
 ?topTable
-topTable(GC_trt_fit, number = 500)
+topTable(GC_tissue_fit, number = 500)
+# output gene lists
+
+# interaction model
+trt_geno <- model.matrix(~GC_trt:GC_geno)
+system.time(GC_trt_geno_voom <- voom(GC_DE, trt_geno, plot = TRUE))
+system.time(GC_trt_geno_fit <- lmFit(GC_trt_geno_voom, trt_geno))
+GC_trt_geno_fit <- eBayes(GC_trt_geno_fit)
+?topTable
+topTable(GC_trt_geno_fit, number = 50)
+# output gene lists
 
 
 
