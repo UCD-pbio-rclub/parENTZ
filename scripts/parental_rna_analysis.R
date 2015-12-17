@@ -94,11 +94,10 @@ write.table(FIELD_counts, file="FIELD_counts_counts_cleaned.csv", sep=",")
 # design matrix 
 GH_samples <- names(GH_counts)
 GC_samples <- names(GC_counts)
-FIELD_samples <- names(FIELD_counts)
+
 
 GH_samples
 GC_samples
-FIELD_samples
 
 #clean way to make design matrices
 GC_geno <- factor(sub("(\\w+)(_)(\\w+)(_)(\\d)(_)(\\w+)",
@@ -126,14 +125,6 @@ GH_tissue <- factor(sub("(\\w+)(_)(\\w+)(_)(\\d)(_)(\\w+)",
                        "\\7", colnames(GH_counts)))
 GH_tissue
 
-# field tissue
-FIELD_geno <- factor(sub("(\\w+)(_)(\\w+)(_)(\\d)(_)(\\w+)",
-                       "\\1", colnames(FIELD_counts)))
-FIELD_geno
-
-FIELD_tissue <- factor(sub("(\\w+)(_)(\\w+)(_)(\\d)(_)(\\w+)",
-                       "\\3", colnames(FIELD_counts)))
-FIELD_tissue
 
 #############
 #############
