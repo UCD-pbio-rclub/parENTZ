@@ -152,10 +152,16 @@ dim(fruit_genes)
 # [1] 2967    6
 head(fruit_genes)
 
+# overlap genes
+merged_genes <- merge(leaf_genes, fruit_genes, by = "row.names")
+head(merged_genes)
+dim(merged_genes)
+
 # write tables
 setwd("/Users/Cody_2/git.repos/brassica_parents/data")
 ?write.table
 write.table(leaf_genes, "parental_leaf_field_DE.csv", sep = ",", row.names = TRUE, col.names = TRUE)
 write.table(fruit_genes, "parental_fruit_field_DE.csv", sep = ",", row.names = TRUE, col.names = TRUE)
+write.table(merged_genes, "parental_merged_field_DE.csv", sep = ",", row.names = TRUE, col.names = TRUE)
 
 #end
