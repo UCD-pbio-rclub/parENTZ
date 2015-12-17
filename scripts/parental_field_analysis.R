@@ -2,15 +2,11 @@
 # Cody Markelz
 # markelz@gmail.com
 # B rapa parental RNA-seq
-# Modified December 16, 2015
+# Modified December 17, 2015
 ###########
 
-# simplify even more by looking at leaf only data
-# DE between genotypes
-# DE between tissues
 # GO enrichment?
 # metabolic differences?
-
 
 # load libs
 library(edgeR)
